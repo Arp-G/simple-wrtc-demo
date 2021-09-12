@@ -1,5 +1,10 @@
 {
-    "presets": [
-        "@babel/preset-env"
-    ]
+  "presets": [
+    "@babel/preset-env"
+  ],
+  "plugins": [
+    "@babel/syntax-dynamic-import",
+    "@babel/plugin-transform-runtime",
+    "@babel/transform-async-to-generator"
+  ]
 }

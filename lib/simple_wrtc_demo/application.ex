@@ -9,8 +9,13 @@ defmodule SimpleWrtcDemo.Application do
     children = [
       # Start the Telemetry supervisor
       SimpleWrtcDemoWeb.Telemetry,
+
       # Start the PubSub system
       {Phoenix.PubSub, name: SimpleWrtcDemo.PubSub},
+
+      # Starts your store supervisor and therefore starts all ETS backed stores
+      SimpleWrtcDemo.StoreSupervisor,
+
       # Start the Endpoint (http/https)
       SimpleWrtcDemoWeb.Endpoint
       # Start a worker by calling: SimpleWrtcDemo.Worker.start_link(arg)
