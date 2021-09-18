@@ -5,19 +5,19 @@ defmodule SimpleWrtcDemo.CallsStore do
 
   ## Public API
   def get_offer(id) do
-    GenServer.call(__MODULE__, {:get, id})
+    GenServer.call(__MODULE__, {:get_offer, id})
   end
 
-  def create_offer(id, offer) do
-    GenServer.call(__MODULE__, {:set, {id, offer}})
-  end
-
-  def save_candidate(id, type, candidate) do
-    GenServer.cast(__MODULE__, {:save_candidate, {id, candidate, type}})
+  def set_offer(id, offer) do
+    GenServer.call(__MODULE__, {:set_offer, {id, offer}})
   end
 
   def get_candidates(id) do
     GenServer.call(__MODULE__, {:get_candidates, id})
+  end
+
+  def set_candidate(id, candidate) do
+    GenServer.cast(__MODULE__, {:set_candidate, {id, candidate}})
   end
 
   ## Server Implemention
@@ -30,34 +30,30 @@ defmodule SimpleWrtcDemo.CallsStore do
   end
 
   def handle_call({:get_candidates, id}, _from, state) do
-    caller_candidates =
+    candidates =
       case Map.get(state, id) do
-        %Call{caller_candidates: caller_candidates} -> caller_candidates
-        _ -> nil
+        %Call{candidates: candidates} -> candidates
+        _ -> []
       end
 
-    {:reply, caller_candidates, state}
+    {:reply, candidates, state}
   end
 
-  def handle_call({:set, {id, offer}}, _from, state) do
+  def handle_call({:get_offer, id}, _from, state) do
+    call = Map.get(state, id)
+    offer = if call, do: call.offer, else: nil
+    {:reply, offer, state}
+  end
+
+  def handle_call({:set_offer, {id, offer}}, _from, state) do
     {:reply, id, Map.put(state, id, %Call{offer: offer})}
   end
 
-  def handle_call({:get, id}, _from, state) do
-    {:reply, Map.get(state, id).offer, state}
-  end
-
-  def handle_cast({:save_candidate, {id, type, candidate}}, state)
-      when type in ["caller", "callee"] do
+  def handle_cast({:set_candidate, {id, candidate}}, state) do
     state =
       case Map.get(state, id) do
-        %Call{caller_candidates: caller_candidates, callee_candidates: callee_candidates} = call ->
-          updated_call =
-            case type do
-              "caller" -> %{call | caller_candidates: [candidate | caller_candidates]}
-              "callee" -> %{call | callee_candidates: [candidate | callee_candidates]}
-            end
-
+        %Call{candidates: candidates} = call ->
+          updated_call = %{call | candidates: [candidate | candidates]}
           Map.put(state, id, updated_call)
 
         _ ->
@@ -67,5 +63,5 @@ defmodule SimpleWrtcDemo.CallsStore do
     {:noreply, state}
   end
 
-  def handle_cast({:save_candidate, _}, state), do: {:noreply, state}
+  def handle_cast({:set_candidate, _}, state), do: {:noreply, state}
 end
