@@ -157,14 +157,13 @@ window.addEventListener('load', () => {
     // This triggers the pc.onicecandidate that generates to ice candidates
     await pc.setLocalDescription(offerDescription);
 
-    // Create a JS object which contains the SDP offer data that can be saved to firestore db collection "offerCandidates"
+    // Create a JS object which contains the SDP offer data
     const offer = {
       sdp: offerDescription.sdp,
       type: offerDescription.type,
     };
 
-    // Save the offer to firestore db collection "offerCandidates", 
-    // the offer ice candidates are saved via the "onicecandidate" event listener
+    // Send the offer to the remote peer via the signaling server
     channel.push("offer", { offer }, 10000);
     console.log("Pushed offer from caller", offer);
     // ---------------------------------------------------

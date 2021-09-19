@@ -13,7 +13,7 @@ defmodule SimpleWrtcDemo.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: SimpleWrtcDemo.PubSub},
 
-      # Starts your store supervisor and therefore starts all ETS backed stores
+      # Starts your store supervisor
       SimpleWrtcDemo.StoreSupervisor,
 
       # Start the Endpoint (http/https)
